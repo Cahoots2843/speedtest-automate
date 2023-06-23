@@ -44,6 +44,32 @@ def agendar_teste():
     realizar_teste()
     schedule.every(30).minutes.do(realizar_teste)
 
+@app.route("/relatorios-resumidos")
+def relatorios_resumidos():
+    relatorios_resumidos = calcular_medias_por_dia()
+    return render_template("relatorios_resumidos.html", relatorios_resumidos=relatorios_resumidos)
+
+def calcular_medias_por_dia():
+    medias_por_dia = {}
+    for teste in historico_testes:
+        data = teste["data"].split()[0]  # obter a parte da data (YYYY-MM-DD)
+        media_download, media_upload = 0, 0
+        count = 0
+        if data in medias_por_dia:
+            media_download, media_upload, count = medias_por_dia[data]
+
+        media_download = (media_download * count + teste["velocidade_download"]) / (count + 1)
+        media_upload = (media_upload * count + teste["velocidade_upload"]) / (count + 1)
+        count += 1
+
+        medias_por_dia[data] = (media_download, media_upload, count)
+
+    relatorios_resumidos = []
+    for data, (media_download, media_upload, _) in medias_por_dia.items():
+        relatorios_resumidos.append((data, media_download, media_upload))
+
+    return relatorios_resumidos
+
 if __name__ == "__main__":
     carregar_historico()
     agendar_teste()
