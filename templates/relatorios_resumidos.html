@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Relatórios Resumidos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Relatórios Resumidos</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Média de Download (Mbps)</th>
+                    <th>Média de Upload (Mbps)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data, media_download, media_upload in relatorios_resumidos %}
+                <tr>
+                    <td>{{ data }}</td>
+                    <td>{{ "%.2f"|format(media_download) }}</td>
+                    <td>{{ "%.2f"|format(media_upload) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
