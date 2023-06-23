@@ -23,91 +23,111 @@
             border-bottom: 1px solid #ddd;
         }
 
-        .loader {
-            border: 10px solid #f3f3f3;
-            border-top: 10px solid #4CAF50;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        .sidebar {
+            background-color: #f8f9fa;
+            height: 100vh;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .sidebar ul {
+            list-style-type: none;
+            padding-left: 0;
         }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar li a {
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .sidebar li a:hover {
+            color: #007bff;
+        }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Histórico de Testes de Velocidade</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Data e Hora</th>
-                    <th>Velocidade de Download (Mbps)</th>
-                    <th>Velocidade de Upload (Mbps)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for teste in historico_testes %}
-                <tr>
-                    <td>{{ teste["data"] }}</td>
-                    <td>{{ "%.2f"|format(teste["velocidade_download"]) }}</td>
-                    <td>{{ "%.2f"|format(teste["velocidade_upload"]) }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <button class="btn btn-primary" id="runTestBtn" {% if is_running %}disabled{% endif %}>
-            {% if is_running %}
-                <span class="loader"></span> Testando...
-            {% else %}
-                Executar Teste
-            {% endif %}
-        </button>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-3 sidebar">
+                <ul>
+                    <li><a href="/">Histórico de Testes</a></li>
+                    <li><a href="/relatorios-resumidos">Relatórios Resumidos</a></li>
+                </ul>
+            </div>
+            <div class="col-9">
+                <h1>Histórico de Testes de Velocidade</h1>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Data e Hora</th>
+                            <th>Velocidade de Download (Mbps)</th>
+                            <th>Velocidade de Upload (Mbps)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teste in historico_testes %}
+                        <tr>
+                            <td>{{ teste["data"] }}</td>
+                            <td>{{ "%.2f"|format(teste["velocidade_download"]) }}</td>
+                            <td>{{ "%.2f"|format(teste["velocidade_upload"]) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button class="btn btn-primary" id="runTestBtn" {% if is_running %}disabled{% endif %}>
+                    {% if is_running %}
+                        <span class="loader"></span> Testando...
+                    {% else %}
+                        Executar Teste
+                    {% endif %}
+                </button>
+            </div>
+        </div>
     </div>
-<script>
-    document.getElementById('runTestBtn').addEventListener('click', function() {
-        var btn = this;
-        btn.disabled = true;
-        btn.innerHTML = `
-            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Testando...
-        `;
-
-        fetch('/run-test')
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
-                alert('Teste realizado com sucesso!');
-                btn.innerHTML = 'Executar Teste';
-                setTimeout(function() {
-                    btn.disabled = false;
-                }, 15000);
-                window.location.reload();
-            })
-            .catch(function(error) {
-                console.log(error);
-            });
-    });
-
-    window.addEventListener('DOMContentLoaded', function() {
-        var btn = document.getElementById('runTestBtn');
-        if ({{ "true" if is_running else "false" }}) {
+    <script>
+        document.getElementById('runTestBtn').addEventListener('click', function() {
+            var btn = this;
             btn.disabled = true;
             btn.innerHTML = `
                 <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                 Testando...
             `;
-            setTimeout(function() {
-                btn.disabled = false;
-                btn.innerHTML = 'Executar Teste';
-            }, 5000);
-        }
-    });
-</script>
+
+            fetch('/run-test')
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(data) {
+                    alert('Teste realizado com sucesso!');
+                    btn.innerHTML = 'Executar Teste';
+                    setTimeout(function() {
+                        btn.disabled = false;
+                    }, 15000);
+                    window.location.reload();
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+        });
+
+        window.addEventListener('DOMContentLoaded', function() {
+            var btn = document.getElementById('runTestBtn');
+            if ({{ "true" if is_running else "false" }}) {
+                btn.disabled = true;
+                btn.innerHTML = `
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Testando...
+                `;
+                setTimeout(function() {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Executar Teste';
+                }, 5000);
+            }
+        });
+    </script>
 </body>
 </html>
